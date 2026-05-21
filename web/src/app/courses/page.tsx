@@ -594,6 +594,8 @@ export default function CoursesPage() {
         if (
           cleanQuery.includes("next lesson") ||
           cleanQuery.includes("next episode") ||
+          cleanQuery.includes("next track") ||
+          cleanQuery.includes("nexttrack") ||
           cleanQuery === "next" ||
           cleanQuery.includes("go to next")
         ) {
@@ -613,6 +615,8 @@ export default function CoursesPage() {
         if (
           cleanQuery.includes("previous lesson") ||
           cleanQuery.includes("previous episode") ||
+          cleanQuery.includes("previous track") ||
+          cleanQuery.includes("previoustrack") ||
           cleanQuery === "previous" ||
           cleanQuery.includes("go back") ||
           cleanQuery.includes("go to previous")

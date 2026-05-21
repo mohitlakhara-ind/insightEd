@@ -167,7 +167,7 @@ export class WakeWordDetector {
             "select", "play", "pause", "resume", "stop", "next", "previous", "close", "exit", "start", "take", "choose", "submit"
           ];
           const courseNounKeywords = [
-            "lesson", "episode", "course", "quiz", "option", "question", "answer",
+            "lesson", "episode", "course", "quiz", "option", "question", "answer", "track",
             "dsa", "mastery", "fullstack", "web", "python", "basics", "speaking", "project", "management", "design"
           ];
           const hasAction = courseActionKeywords.some(kw => cleanText.includes(kw));

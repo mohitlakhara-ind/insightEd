@@ -56,7 +56,10 @@ export function VoiceAssistantOverlay() {
       // e.g. "hello alan open courses"
       const cleanText = spokenText ? spokenText.toLowerCase().trim() : "";
       
-      const courseKeywords = ["course", "learn", "lesson", "class", "study", "vocational", "catalog", "track"];
+      const courseKeywords = [
+        "course", "learn", "lesson", "class", "study", "vocational", "catalog", "track",
+        "dsa", "python", "fullstack", "web", "speaking", "agile", "scrum", "design", "ui", "ux", "mastery", "basics"
+      ];
       const gameKeywords = ["game", "mind", "play", "puzzle", "match", "cognitive", "brain", "toy"];
       const communityKeywords = ["community", "ai community", "mitra", "sarah", "companion", "coach", "chat", "connect", "social"];
       const pronunciationKeywords = ["pronunciation", "speech", "coach", "practice", "speak", "talk", "voice", "pronounce", "speaking", "talking"];
