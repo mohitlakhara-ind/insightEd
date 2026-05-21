@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+:root {
+  --background: #11131c;
+  --foreground: #e1e1ef;
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-elevated: rgba(255, 255, 255, 0.12);
+  --surface-muted: rgba(255, 255, 255, 0.04);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #e91e63; /* Soft Rose */
+  --accent-primary: #3f51b5; /* Royal Indigo */
+  --accent-fg: #ffffff;
+  --accent-subtle: rgba(233, 30, 99, 0.12);
+  --accent-glow: rgba(233, 30, 99, 0.3);
+  --ring: #e91e63;
+  --blob-1: color-mix(in oklab, #3f51b5 35%, transparent); /* Royal Indigo glow */
+  --blob-2: color-mix(in oklab, #e91e63 25%, transparent); /* Soft Rose glow */
+  --blob-3: color-mix(in oklab, #ffd066 12%, transparent); /* Sunshine Gold highlight */
+  --grid-fade: rgba(255, 255, 255, 0.03);
+}
+
+/* Explicit class-based dark mode (uses same dark theme variables) */
+.dark {
+  --background: #11131c;
+  --foreground: #e1e1ef;
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-elevated: rgba(255, 255, 255, 0.12);
+  --surface-muted: rgba(255, 255, 255, 0.04);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #e91e63;
+  --accent-primary: #3f51b5;
+  --accent-fg: #ffffff;
+  --accent-subtle: rgba(233, 30, 99, 0.12);
+  --accent-glow: rgba(233, 30, 99, 0.3);
+  --ring: #e91e63;
+  --blob-1: color-mix(in oklab, #3f51b5 35%, transparent);
+  --blob-2: color-mix(in oklab, #e91e63 25%, transparent);
+  --blob-3: color-mix(in oklab, #ffd066 12%, transparent);
+  --grid-fade: rgba(255, 255, 255, 0.03);
+}
+
+/* Light mode override style if toggle is activated */
+.light {
+  --background: #fdfcff;
+  --foreground: #11131c;
+  --surface: rgba(255, 255, 255, 0.75);
+  --surface-elevated: rgba(255, 255, 255, 0.95);
+  --surface-muted: #f1f5f9;
+  --text-primary: #11131c;
+  --text-secondary: #454652;
+  --text-muted: #8f909e;
+  --border: rgba(143, 144, 158, 0.2);
+  --accent: #e91e63;
+  --accent-primary: #3f51b5;
+  --accent-fg: #ffffff;
+  --accent-subtle: #ffeced;
+  --accent-glow: rgba(233, 30, 99, 0.15);
+  --ring: #3f51b5;
+  --blob-1: color-mix(in oklab, #3f51b5 15%, transparent);
+  --blob-2: color-mix(in oklab, #e91e63 10%, transparent);
+  --blob-3: color-mix(in oklab, #ffd066 8%, transparent);
+  --grid-fade: rgba(17, 19, 28, 0.04);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border: color-mix(in oklab, CanvasText 40%, transparent);
+    --text-secondary: var(--text-primary);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+.bg-grid-mesh {
+  background-image:
+    linear-gradient(to bottom, transparent, var(--background)),
+    linear-gradient(var(--grid-fade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-fade) 1px, transparent 1px);
+  background-size: auto, 48px 48px, 48px 48px;
+  background-position: center;
+}
+
+.glass-panel {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.text-gradient-hero {
+  background-image: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    var(--accent) 50%,
+    #3f51b5 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 42s linear infinite;
+}
+
+.border-beam {
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  background: linear-gradient(var(--surface-elevated), var(--surface-elevated)) padding-box,
+              linear-gradient(90deg, transparent, var(--accent), transparent) border-box;
+  background-size: 100% 100%, 200% 100%;
+  animation: border-beam-anim 4s linear infinite;
+}
+
+@keyframes border-beam-anim {
+  0% { background-position: 0% 0%, 0% 0%; }
+  100% { background-position: 0% 0%, 200% 0%; }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(11, 13, 22, 0.4);
+  border-top-color: rgba(255, 255, 255, 0.2);
+  border-left-color: rgba(255, 255, 255, 0.2);
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+  border-right-color: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(233, 30, 99, 0.15), 0 8px 32px 0 rgba(11, 13, 22, 0.5);
+  transform: translateY(-2px);
+}
+
+.text-gradient-shimmer {
+  background: linear-gradient(
+    to right,
+    var(--text-primary) 20%,
+    var(--accent) 40%,
+    var(--accent) 60%,
+    var(--text-primary) 80%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

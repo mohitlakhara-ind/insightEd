@@ -1,0 +1,8 @@
+# Temp folders
+temp-repo/
+
+# OS files
+.DS_Store
+
+# Local environments
+.env*.local
