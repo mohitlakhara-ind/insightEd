@@ -90,6 +90,8 @@ export function VoiceAssistantOverlay() {
         matchesAny(cleanText, homeKeywords);
 
       if (hasCommand) {
+        // Set user transcript immediately so they see their command in the UI
+        useVoiceStore.getState().setTranscript(spokenText || "");
         // Direct command execution (bypass welcome greeting to improve responsiveness)
         setTimeout(() => {
           alanServiceRef.current?.sendText(cleanText);

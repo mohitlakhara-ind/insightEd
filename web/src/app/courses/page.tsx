@@ -26,6 +26,7 @@ import {
 import { db } from "@/services/firebase";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { AlanService } from "@/services/alan-service";
+import { useVoiceStore } from "@/hooks/use-voice-store";
 
 interface Lesson {
   title: string;
@@ -277,10 +278,18 @@ export default function CoursesPage() {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = playbackSpeed;
       utterance.pitch = 1.0;
+      utterance.onstart = () => {
+        useVoiceStore.getState().setVoiceState("speaking");
+      };
       utterance.onend = () => {
         if (!showQuiz) {
           stopAudio();
         }
+        useVoiceStore.getState().setVoiceState("idle");
+      };
+      utterance.onerror = (e) => {
+        console.error("[CoursesPage TTS] error:", e);
+        useVoiceStore.getState().setVoiceState("idle");
       };
       window.speechSynthesis.speak(utterance);
     }
@@ -313,6 +322,7 @@ export default function CoursesPage() {
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.pause();
     }
+    useVoiceStore.getState().setVoiceState("idle");
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
   };
 
@@ -322,6 +332,7 @@ export default function CoursesPage() {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
         setIsPlaying(true);
+        useVoiceStore.getState().setVoiceState("speaking");
         // resume interval
         progressIntervalRef.current = setInterval(() => {
           setPlayProgress((prev) => {
@@ -344,6 +355,7 @@ export default function CoursesPage() {
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
+    useVoiceStore.getState().setVoiceState("idle");
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
   }
 
@@ -538,6 +550,7 @@ export default function CoursesPage() {
       if (matchedCourseName) {
         const course = stateRef.current.courses.find(c => c.name.toLowerCase() === matchedCourseName.toLowerCase());
         if (course) {
+          useVoiceStore.getState().setAssistantResponse(`Opening the ${course.name} module.`);
           actionsRef.current.openPlayer(course);
           return true;
         }
@@ -552,6 +565,8 @@ export default function CoursesPage() {
           cleanQuery.includes("pause playback")
         ) {
           actionsRef.current.pauseAudio();
+          useVoiceStore.getState().setAssistantResponse("Pausing playback.");
+          useVoiceStore.getState().setVoiceState("idle");
           return true;
         }
         if (
@@ -562,6 +577,7 @@ export default function CoursesPage() {
           cleanQuery.includes("start playback")
         ) {
           actionsRef.current.resumeAudio();
+          useVoiceStore.getState().setAssistantResponse("Resuming playback.");
           return true;
         }
         if (
@@ -570,6 +586,8 @@ export default function CoursesPage() {
           cleanQuery.includes("stop audio")
         ) {
           actionsRef.current.stopAudio();
+          useVoiceStore.getState().setAssistantResponse("Stopping audio.");
+          useVoiceStore.getState().setVoiceState("idle");
           return true;
         }
       }
@@ -585,6 +603,8 @@ export default function CoursesPage() {
           cleanQuery.includes("exit player")
         ) {
           actionsRef.current.closePlayer();
+          useVoiceStore.getState().setAssistantResponse("Closing course player.");
+          useVoiceStore.getState().setVoiceState("idle");
           return true;
         }
       }
@@ -602,11 +622,23 @@ export default function CoursesPage() {
           const lessons = stateRef.current.selectedCourse.lessons || [];
           const nextIdx = stateRef.current.currentLessonIndex + 1;
           if (nextIdx < lessons.length) {
+            const nextLesson = lessons[nextIdx];
+            useVoiceStore.getState().setAssistantResponse(`Playing next track: ${nextLesson.title}.`);
             actionsRef.current.selectLesson(nextIdx);
           } else {
+            useVoiceStore.getState().setAssistantResponse("This is the final lesson of the course.");
             if (typeof window !== "undefined" && window.speechSynthesis) {
               window.speechSynthesis.cancel();
               const utterance = new SpeechSynthesisUtterance("This is the final lesson of the course.");
+              utterance.onstart = () => {
+                useVoiceStore.getState().setVoiceState("speaking");
+              };
+              utterance.onend = () => {
+                useVoiceStore.getState().setVoiceState("idle");
+              };
+              utterance.onerror = () => {
+                useVoiceStore.getState().setVoiceState("idle");
+              };
               window.speechSynthesis.speak(utterance);
             }
           }
@@ -623,11 +655,24 @@ export default function CoursesPage() {
         ) {
           const prevIdx = stateRef.current.currentLessonIndex - 1;
           if (prevIdx >= 0) {
+            const lessons = stateRef.current.selectedCourse.lessons || [];
+            const prevLesson = lessons[prevIdx];
+            useVoiceStore.getState().setAssistantResponse(`Playing previous track: ${prevLesson.title}.`);
             actionsRef.current.selectLesson(prevIdx);
           } else {
+            useVoiceStore.getState().setAssistantResponse("This is the first lesson of the course.");
             if (typeof window !== "undefined" && window.speechSynthesis) {
               window.speechSynthesis.cancel();
               const utterance = new SpeechSynthesisUtterance("This is the first lesson of the course.");
+              utterance.onstart = () => {
+                useVoiceStore.getState().setVoiceState("speaking");
+              };
+              utterance.onend = () => {
+                useVoiceStore.getState().setVoiceState("idle");
+              };
+              utterance.onerror = () => {
+                useVoiceStore.getState().setVoiceState("idle");
+              };
               window.speechSynthesis.speak(utterance);
             }
           }
@@ -644,6 +689,7 @@ export default function CoursesPage() {
             cleanQuery.includes("take quiz") ||
             cleanQuery.includes("open quiz")
           ) {
+            useVoiceStore.getState().setAssistantResponse("Starting course quiz.");
             actionsRef.current.startQuiz();
             return true;
           }
@@ -661,6 +707,7 @@ export default function CoursesPage() {
               else if (optVal === "four" || optVal === "4") optIdx = 3;
               
               if (optIdx >= 0 && optIdx < 4) {
+                useVoiceStore.getState().setAssistantResponse(`Selected option ${optIdx + 1}.`);
                 actionsRef.current.handleSelectOption(optIdx);
                 return true;
               }
@@ -671,6 +718,7 @@ export default function CoursesPage() {
               cleanQuery.includes("submit answer") ||
               cleanQuery.includes("submit quiz")
             ) {
+              useVoiceStore.getState().setAssistantResponse("Submitting answer.");
               actionsRef.current.handleSubmitAnswer();
               return true;
             }
@@ -681,6 +729,7 @@ export default function CoursesPage() {
               cleanQuery === "continue" ||
               (stateRef.current.quizSubmitted && cleanQuery === "next")
             ) {
+              useVoiceStore.getState().setAssistantResponse("Loading next question.");
               actionsRef.current.handleNextQuestion();
               return true;
             }
@@ -691,6 +740,7 @@ export default function CoursesPage() {
               cleanQuery.includes("restart") ||
               cleanQuery.includes("try again")
             ) {
+              useVoiceStore.getState().setAssistantResponse("Restarting quiz.");
               actionsRef.current.startQuiz();
               return true;
             }
@@ -699,7 +749,9 @@ export default function CoursesPage() {
               cleanQuery.includes("close quiz") ||
               cleanQuery.includes("return")
             ) {
+              useVoiceStore.getState().setAssistantResponse("Returning to course player.");
               actionsRef.current.setShowQuiz(false);
+              useVoiceStore.getState().setVoiceState("idle");
               return true;
             }
           }
