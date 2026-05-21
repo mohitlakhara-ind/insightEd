@@ -1,7 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs, useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -31,6 +31,34 @@ export default function TabLayout() {
         headerTintColor: palette.text,
         headerStyle: { backgroundColor: palette.surface },
         headerShown: useClientOnlyValue(false, true),
+        headerRight: () => (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16, gap: 14 }}>
+            <Pressable
+              onPress={() => router.push('/modal')}
+              accessibilityRole="button"
+              accessibilityLabel="About InsightEd"
+              accessibilityHint="Double tap to open about page"
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.6 : 1,
+                padding: 4, // Exceed target size
+              })}
+            >
+              <FontAwesome name="info-circle" size={22} color={palette.text} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/profile')}
+              accessibilityRole="button"
+              accessibilityLabel="User profile and accessibility settings"
+              accessibilityHint="Double tap to open profile, voice guidance toggle, or sign out"
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.6 : 1,
+                padding: 4, // Exceed target size
+              })}
+            >
+              <FontAwesome name="user-circle" size={22} color={palette.text} />
+            </Pressable>
+          </View>
+        ),
       }}
     >
       <Tabs.Screen
@@ -43,23 +71,6 @@ export default function TabLayout() {
             <TabBarIcon name="home" color={color} />
           ),
           headerTitle: 'InsightEd',
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push('/modal')}
-              accessibilityRole="button"
-              accessibilityLabel="About InsightEd"
-              style={{ marginRight: 16 }}
-            >
-              {({ pressed }) => (
-                <FontAwesome
-                  name="info-circle"
-                  size={22}
-                  color={palette.text}
-                  style={{ opacity: pressed ? 0.6 : 1 }}
-                />
-              )}
-            </Pressable>
-          ),
         }}
       />
       <Tabs.Screen
@@ -96,3 +107,4 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+

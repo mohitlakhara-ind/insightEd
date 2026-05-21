@@ -6,6 +6,7 @@ import { InsightScreen } from '@/components/InsightScreen';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { fonts } from '@/constants/typography';
+import { useAccessibilityAnnouncement } from '@/context/accessibility-context';
 
 type Scene = {
   text: string;
@@ -39,6 +40,11 @@ export default function StoryScreen() {
   const [sceneIndex, setSceneIndex] = useState(0);
   const scene = STORY[sceneIndex];
 
+  // Announce the screen when focused
+  useAccessibilityAnnouncement(
+    'Story Adventure screen. Listen to the narration and select your choices to proceed through the adventure.'
+  );
+
   const narrate = (text: string) => {
     Speech.stop();
     Speech.speak(text, { rate: 0.88 });
@@ -66,6 +72,7 @@ export default function StoryScreen() {
             onPress={() => narrate(scene.text)}
             accessibilityRole="button"
             accessibilityLabel="Listen to story"
+            accessibilityHint="Double tap to hear the text-to-speech engine read the scene out loud"
             style={[styles.listenBtn, { backgroundColor: c.accentMuted }]}
           >
             <Text style={{ color: c.accent, fontFamily: fonts.bold }}>Listen</Text>
@@ -81,6 +88,7 @@ export default function StoryScreen() {
             }}
             accessibilityRole="button"
             accessibilityLabel={choice.label}
+            accessibilityHint={`Double tap to select ${choice.label} and proceed`}
             style={[styles.choice, { borderColor: c.border, backgroundColor: c.surface }]}
           >
             <Text style={{ color: c.text, fontFamily: fonts.semibold }}>{choice.label}</Text>
@@ -92,6 +100,7 @@ export default function StoryScreen() {
             onPress={() => setSceneIndex(0)}
             accessibilityRole="button"
             accessibilityLabel="Play again"
+            accessibilityHint="Double tap to reset the story back to the beginning"
             style={[styles.choice, { borderColor: c.accent, backgroundColor: c.accentMuted }]}
           >
             <Text style={{ color: c.accent, fontFamily: fonts.bold }}>Play again</Text>

@@ -16,6 +16,7 @@ import 'react-native-reanimated';
 import { AuthRedirect } from '@/components/AuthRedirect';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/context/auth-context';
+import { AccessibilityProvider } from '@/context/accessibility-context';
 import { insightDarkNavigation, insightLightNavigation } from '@/constants/navigationTheme';
 
 export { ErrorBoundary } from 'expo-router';
@@ -47,9 +48,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
+      <AccessibilityProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </AccessibilityProvider>
     </SafeAreaProvider>
   );
 }
@@ -73,7 +76,12 @@ function RootLayoutNav() {
           name="modal"
           options={{ presentation: 'modal', title: 'About InsightEd' }}
         />
+        <Stack.Screen
+          name="profile"
+          options={{ presentation: 'modal', title: 'Profile & Settings' }}
+        />
       </Stack>
     </ThemeProvider>
   );
 }
+

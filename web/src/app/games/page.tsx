@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { DynamicBackground } from "@/components/dynamic-background";
-import { BookOpen, Puzzle, Keyboard } from "lucide-react";
+import { BookOpen, Puzzle } from "lucide-react";
 
 const GAMES = [
   {
@@ -23,15 +23,6 @@ const GAMES = [
     color: "cyan",
     status: "Available",
     tags: ["Memory", "Audio"]
-  },
-  {
-    id: "speed-type",
-    title: "Speed Typing Sprint",
-    description: "Improve keyboard fluency with screen-reader friendly typing challenges.",
-    icon: <Keyboard className="w-10 h-10" />,
-    color: "fuchsia",
-    status: "Coming Soon",
-    tags: ["Typing", "Speed"]
   }
 ];
 

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { fonts } from '@/constants/typography';
+import { useAccessibilityAnnouncement } from '@/context/accessibility-context';
 
 const MITRA_REPLIES = [
   "That's a great question! Keep practicing pronunciation daily.",
@@ -19,6 +20,11 @@ export default function CommunityScreen() {
   const [thread, setThread] = useState<{ role: 'user' | 'mitra'; text: string }[]>([
     { role: 'mitra', text: "Hi! I'm Mitra, your learning companion. How can I help today?" },
   ]);
+
+  // Announce the screen when focused
+  useAccessibilityAnnouncement(
+    "Community screen. Chat with Mitra, your AI learning assistant. Type your message at the bottom of the screen."
+  );
 
   const send = () => {
     if (!message.trim()) return;
@@ -40,7 +46,7 @@ export default function CommunityScreen() {
         Community
       </Text>
       <Text style={[styles.body, { color: c.textSecondary, fontFamily: fonts.regular }]}>
-        Chat with Mitra, your AI learning companion. Live peer rooms connect in a future release.
+        Chat with Mitra, your AI learning companion.
       </Text>
 
       <View style={[styles.chat, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -76,14 +82,23 @@ export default function CommunityScreen() {
           onChangeText={setMessage}
           placeholder="Message Mitra…"
           placeholderTextColor={c.textMuted}
-          accessibilityLabel="Message input"
+          accessibilityLabel="Message input field"
+          accessibilityHint="Type your message to Mitra here"
           style={[styles.input, { color: c.text, borderColor: c.border, backgroundColor: c.surface }]}
         />
-        <Button label="Send" onPress={send} colors={c} style={{ minWidth: 88 }} />
+        <Button
+          label="Send"
+          onPress={send}
+          colors={c}
+          style={{ minWidth: 88 }}
+          accessibilityLabel="Send message"
+          accessibilityHint="Double tap to send your message to Mitra"
+        />
       </View>
     </InsightScreen>
   );
 }
+
 
 const styles = StyleSheet.create({
   title: { fontSize: 28 },

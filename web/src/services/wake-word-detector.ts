@@ -134,7 +134,7 @@ export class WakeWordDetector {
         const directPhrases = [
           "courses", "course", "open courses", "go to courses", "learn vocations", "vocational courses", "catalog", "browse catalog",
           "games", "game", "open games", "go to games", "mind games", "play games", "play mind games",
-          "community", "open community", "go to community", "peer rooms", "peer room", "join peer rooms", "chat rooms", "chat room",
+          "community", "open community", "go to community", "ai community", "ai companions", "ai coach", "chat rooms", "chat room",
           "pronunciation", "pronunciation coach", "open pronunciation", "speech coach", "ai speech coach", "practice pronunciation", "practice speaking",
           "home", "go home", "go to home", "main page", "welcome page", "dashboard"
         ];
@@ -159,6 +159,21 @@ export class WakeWordDetector {
               isDirectCommand = true;
               break;
             }
+          }
+        }
+
+        if (!isDirectCommand) {
+          const courseActionKeywords = [
+            "select", "play", "pause", "resume", "stop", "next", "previous", "close", "exit", "start", "take", "choose", "submit"
+          ];
+          const courseNounKeywords = [
+            "lesson", "episode", "course", "quiz", "option", "question", "answer",
+            "dsa", "mastery", "fullstack", "web", "python", "basics", "speaking", "project", "management", "design"
+          ];
+          const hasAction = courseActionKeywords.some(kw => cleanText.includes(kw));
+          const hasNoun = courseNounKeywords.some(kw => cleanText.includes(kw));
+          if (hasAction && hasNoun) {
+            isDirectCommand = true;
           }
         }
 

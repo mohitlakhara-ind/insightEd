@@ -13,6 +13,7 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { fonts } from '@/constants/typography';
 import { db } from '@/services/firebase';
+import { useAccessibilityAnnouncement } from '@/context/accessibility-context';
 
 type Course = {
   id: string;
@@ -35,6 +36,11 @@ export default function CoursesScreen() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Announce the screen when focused
+  useAccessibilityAnnouncement(
+    'Courses and Audio Library. Navigate through the list and select a course to play its description.'
+  );
 
   useEffect(() => {
     (async () => {
@@ -85,6 +91,7 @@ export default function CoursesScreen() {
               onPress={() => playLesson(course)}
               accessibilityRole="button"
               accessibilityLabel={`${course.name}. ${course.level ?? ''}. ${course.episodes ?? 0} episodes. ${course.description ?? ''}`}
+              accessibilityHint="Double tap to play the audio overview for this course"
               style={[
                 styles.row,
                 {

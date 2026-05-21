@@ -8,12 +8,9 @@ import {
   ArrowLeft, 
   Bot, 
   MessageSquare, 
-  Users, 
   X, 
   Send, 
   Volume2, 
-  Mic, 
-  MicOff, 
   Sparkles
 } from "lucide-react";
 
@@ -27,7 +24,7 @@ export default function CommunityPage() {
   const router = useRouter();
 
   // Dialog Modals State
-  const [activeModal, setActiveModal] = useState<"professional" | "mitra" | "peer" | null>(null);
+  const [activeModal, setActiveModal] = useState<"professional" | "mitra" | null>(null);
   
   // AI Interview states
   const [interviewStep, setInterviewStep] = useState(0);
@@ -49,8 +46,7 @@ export default function CommunityPage() {
   ]);
   const [mitraInput, setMitraInput] = useState("");
 
-  // Peer room states
-  const [isMuted, setIsMuted] = useState(true);
+
 
   // TTS Helper
   const announceSpeech = (text: string) => {
@@ -141,7 +137,7 @@ export default function CommunityPage() {
       </motion.header>
 
       {/* Feature Cards Grid */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl relative z-10">
+      <div className="grid gap-8 md:grid-cols-2 w-full max-w-4xl relative z-10">
         
         {/* InsightEd Professional Card */}
         <motion.div
@@ -201,37 +197,6 @@ export default function CommunityPage() {
               className="w-full h-13 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold text-sm hover:bg-rose-500 hover:text-white transition-all hover:scale-[1.02]"
             >
               Chat Now
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Peer Audio Rooms Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="group relative"
-        >
-          <div className="absolute inset-0 bg-linear-to-br from-emerald-500/20 to-cyan-500/20 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative h-full bg-[var(--surface-elevated)]/85 backdrop-blur-xl border border-[var(--border)] rounded-[3rem] p-8 flex flex-col shadow-xl overflow-hidden hover:border-emerald-500/40 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[50px] rounded-full pointer-events-none" />
-            <div className="size-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-6 border border-emerald-500/20 shadow-inner">
-              <Users size={32} />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-3">
-              Peer Rooms
-            </h2>
-            <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-8 flex-grow">
-              Join live glassmorphic audio tables. Practice English conversation, host algorithmic study circles, and build together.
-            </p>
-            <button 
-              onClick={() => {
-                setActiveModal("peer");
-                announceSpeech("Joined DSA Study Group peer audio table.");
-              }}
-              className="w-full h-13 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold text-sm hover:bg-emerald-500 hover:text-white transition-all hover:scale-[1.02]"
-            >
-              Browse All Rooms
             </button>
           </div>
         </motion.div>
@@ -398,119 +363,6 @@ export default function CommunityPage() {
                       className="size-13 rounded-2xl bg-rose-500 text-white flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 transition-all shrink-0"
                     >
                       <Send size={18} />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* MODAL 3: Peer Room Collaboration */}
-              {activeModal === "peer" && (
-                <div className="flex flex-col h-full flex-grow overflow-hidden pt-4 space-y-6">
-                  <div className="flex items-center justify-between pb-4 border-b border-[var(--border)]">
-                    <div className="flex items-center gap-3">
-                      <Users className="text-emerald-400" size={24} />
-                      <div>
-                        <h3 className="font-extrabold text-white text-base">DSA Study Group</h3>
-                        <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Active Peer Table #04 · 3 Members Active</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Audio visualization panel */}
-                  <div className="h-36 rounded-3xl bg-black/20 border border-white/5 p-6 flex flex-col justify-center items-center relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[40px] rounded-full pointer-events-none" />
-                    
-                    <div className="flex items-center gap-1.5 mb-4">
-                      {[...Array(12)].map((_, idx) => (
-                        <motion.div
-                          key={idx}
-                          animate={{
-                            height: [10, ((idx * 6) % 30) + 15, 10]
-                          }}
-                          transition={{
-                            duration: 0.7,
-                            repeat: Infinity,
-                            delay: idx * 0.04,
-                            ease: "easeInOut"
-                          }}
-                          className="w-1.5 bg-emerald-500/60 rounded-full"
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[10px] text-emerald-400 font-black uppercase tracking-widest animate-pulse">
-                      Active Streaming Voice Table
-                    </span>
-                  </div>
-
-                  {/* Members list */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black text-[var(--text-muted)] uppercase tracking-wider">Participants</h4>
-                    <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
-                      <div className="p-3 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="size-8 rounded-full bg-indigo-500 text-white font-black text-xs flex items-center justify-center">R</div>
-                          <span className="text-xs font-bold text-white">Ramesh</span>
-                        </div>
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-black uppercase border border-indigo-500/20">Speaking</span>
-                      </div>
-
-                      <div className="p-3 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="size-8 rounded-full bg-rose-500 text-white font-black text-xs flex items-center justify-center">A</div>
-                          <span className="text-xs font-bold text-white">Asha</span>
-                        </div>
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 text-[var(--text-muted)] font-black uppercase">Muted</span>
-                      </div>
-
-                      <div className="p-3 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="size-8 rounded-full bg-emerald-500 text-white font-black text-xs flex items-center justify-center">J</div>
-                          <span className="text-xs font-bold text-white">John</span>
-                        </div>
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 text-[var(--text-muted)] font-black uppercase">Listening</span>
-                      </div>
-
-                      <div className="p-3 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="size-8 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-xs border border-emerald-500/20 flex items-center justify-center">U</div>
-                          <span className="text-xs font-bold text-emerald-400">You (Student)</span>
-                        </div>
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase border ${
-                          isMuted 
-                            ? "bg-rose-500/10 border-rose-500/20 text-rose-400" 
-                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                        }`}>
-                          {isMuted ? "Muted" : "Active"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions buttons */}
-                  <div className="pt-4 border-t border-[var(--border)] flex justify-between items-center">
-                    <button
-                      onClick={() => {
-                        setActiveModal(null);
-                        announceSpeech("Disconnected from peer room.");
-                      }}
-                      className="h-11 px-6 rounded-full bg-white/5 border border-[var(--border)] text-white text-xs font-bold hover:bg-rose-500/10 hover:border-rose-500/20 transition-colors"
-                    >
-                      Leave Table
-                    </button>
-                    
-                    <button
-                      onClick={() => {
-                        setIsMuted(!isMuted);
-                        announceSpeech(isMuted ? "Microphone active. Live." : "Microphone muted.");
-                      }}
-                      className={`h-11 px-6 rounded-full text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-lg active:scale-95 ${
-                        isMuted 
-                          ? "bg-emerald-500 shadow-emerald-500/10" 
-                          : "bg-rose-500 shadow-rose-500/10"
-                      }`}
-                    >
-                      {isMuted ? <Mic size={14} /> : <MicOff size={14} />}
-                      {isMuted ? "Unmute Voice" : "Mute Microphone"}
                     </button>
                   </div>
                 </div>

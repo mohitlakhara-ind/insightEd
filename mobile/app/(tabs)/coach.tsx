@@ -15,6 +15,7 @@ import { fonts } from '@/constants/typography';
 import { useAudioRecorder } from '@/hooks/use-audio-recorder';
 import { AudioService } from '@/lib/audio';
 import { fetchPronunciationQuotes } from '@/lib/pronunciation-quotes';
+import { useAccessibilityAnnouncement } from '@/context/accessibility-context';
 
 export default function CoachScreen() {
   const scheme = useColorScheme() ?? 'light';
@@ -33,6 +34,11 @@ export default function CoachScreen() {
     playRecording,
     resetRecording,
   } = useAudioRecorder();
+
+  // Announce the screen when focused
+  useAccessibilityAnnouncement(
+    'Pronunciation Coach screen. Practice English phrases. Use the buttons below to listen to the phrase, record your practice session, and play back your voice.'
+  );
 
   useEffect(() => {
     fetchPronunciationQuotes().then((q) => {
@@ -95,6 +101,7 @@ export default function CoachScreen() {
           label="Listen"
           icon="volume-up"
           colors={c}
+          accessibilityHint="Hear the correct pronunciation of the phrase read aloud"
           onPress={() => AudioService.speak(quote)}
         />
         <ControlBtn
@@ -102,6 +109,7 @@ export default function CoachScreen() {
           icon={isRecording ? 'stop' : 'microphone'}
           colors={c}
           active={isRecording}
+          accessibilityHint={isRecording ? "Stop recording your voice" : "Start recording your voice using the microphone"}
           onPress={handleRecord}
         />
         <ControlBtn
@@ -109,9 +117,16 @@ export default function CoachScreen() {
           icon="play"
           colors={c}
           disabled={!uri}
+          accessibilityHint="Play back your last recording to compare"
           onPress={playRecording}
         />
-        <ControlBtn label="Next" icon="arrow-right" colors={c} onPress={handleNext} />
+        <ControlBtn
+          label="Next"
+          icon="arrow-right"
+          colors={c}
+          accessibilityHint="Skip to the next practice phrase"
+          onPress={handleNext}
+        />
       </View>
 
       <View style={styles.dots}>
@@ -141,6 +156,7 @@ function ControlBtn({
   onPress,
   disabled,
   active,
+  accessibilityHint,
 }: {
   label: string;
   icon: React.ComponentProps<typeof FontAwesome>['name'];
@@ -148,6 +164,7 @@ function ControlBtn({
   onPress: () => void;
   disabled?: boolean;
   active?: boolean;
+  accessibilityHint?: string;
 }) {
   return (
     <Pressable
@@ -155,6 +172,7 @@ function ControlBtn({
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
       style={[
         styles.control,
         {
@@ -171,6 +189,7 @@ function ControlBtn({
     </Pressable>
   );
 }
+
 
 const styles = StyleSheet.create({
   title: { fontSize: 28 },

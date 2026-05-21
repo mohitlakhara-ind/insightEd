@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { db } from "@/services/firebase";
 import { collection, getDocs, addDoc } from "firebase/firestore";
+import { AlanService } from "@/services/alan-service";
 
 interface Lesson {
   title: string;
@@ -441,6 +442,273 @@ export default function CoursesPage() {
       announceSpeech(`Quiz finished! You scored ${quizScore} out of ${quizzes.length} correct. Experience points added successfully.`);
     }
   };
+
+  // Voice Command integration
+  const stateRef = useRef({
+    selectedCourse,
+    currentLessonIndex,
+    isPlaying,
+    showQuiz,
+    currentQuizIndex,
+    selectedAnswer,
+    quizSubmitted,
+    quizFinished,
+    courses,
+  });
+
+  useEffect(() => {
+    stateRef.current = {
+      selectedCourse,
+      currentLessonIndex,
+      isPlaying,
+      showQuiz,
+      currentQuizIndex,
+      selectedAnswer,
+      quizSubmitted,
+      quizFinished,
+      courses,
+    };
+  }, [
+    selectedCourse,
+    currentLessonIndex,
+    isPlaying,
+    showQuiz,
+    currentQuizIndex,
+    selectedAnswer,
+    quizSubmitted,
+    quizFinished,
+    courses,
+  ]);
+
+  const actionsRef = useRef({
+    openPlayer,
+    closePlayer,
+    playAudio,
+    pauseAudio,
+    resumeAudio,
+    stopAudio,
+    selectLesson,
+    startQuiz,
+    handleSelectOption,
+    handleSubmitAnswer,
+    handleNextQuestion,
+    setShowQuiz,
+  });
+
+  useEffect(() => {
+    actionsRef.current = {
+      openPlayer,
+      closePlayer,
+      playAudio,
+      pauseAudio,
+      resumeAudio,
+      stopAudio,
+      selectLesson,
+      startQuiz,
+      handleSelectOption,
+      handleSubmitAnswer,
+      handleNextQuestion,
+      setShowQuiz,
+    };
+  });
+
+  useEffect(() => {
+    const courseKeywords = [
+      { name: "DSA Mastery", keywords: ["dsa", "data structures", "dsa mastery"] },
+      { name: "Fullstack Web", keywords: ["fullstack", "web", "full stack"] },
+      { name: "Python Basics", keywords: ["python", "python basics"] },
+      { name: "Public Speaking", keywords: ["public speaking", "speaking"] },
+      { name: "Project Management", keywords: ["project management", "agile", "scrum"] },
+      { name: "UI/UX Design", keywords: ["ui", "ux", "design", "ui/ux design", "ui ux design"] },
+    ];
+
+    const unsubscribe = AlanService.getInstance().registerCommandListener((query, cleanQuery) => {
+      // 1. Course Selection / Switching (Always active if query contains a course keyword)
+      let matchedCourseName = "";
+      for (const item of courseKeywords) {
+        if (item.keywords.some(kw => cleanQuery.includes(kw))) {
+          const isExplicitSelect = ["open", "select", "start", "play", "go to", "choose"].some(prefix => cleanQuery.includes(prefix));
+          if (isExplicitSelect || !stateRef.current.selectedCourse || item.keywords.some(kw => cleanQuery === kw)) {
+            matchedCourseName = item.name;
+            break;
+          }
+        }
+      }
+
+      if (matchedCourseName) {
+        const course = stateRef.current.courses.find(c => c.name.toLowerCase() === matchedCourseName.toLowerCase());
+        if (course) {
+          actionsRef.current.openPlayer(course);
+          return true;
+        }
+      }
+
+      // 2. Playback Control (when player is open and NOT showing quiz)
+      if (stateRef.current.selectedCourse && !stateRef.current.showQuiz) {
+        if (
+          cleanQuery === "pause" ||
+          cleanQuery.includes("pause lesson") ||
+          cleanQuery.includes("pause audio") ||
+          cleanQuery.includes("pause playback")
+        ) {
+          actionsRef.current.pauseAudio();
+          return true;
+        }
+        if (
+          cleanQuery === "play" ||
+          cleanQuery === "resume" ||
+          cleanQuery.includes("play lesson") ||
+          cleanQuery.includes("resume audio") ||
+          cleanQuery.includes("start playback")
+        ) {
+          actionsRef.current.resumeAudio();
+          return true;
+        }
+        if (
+          cleanQuery === "stop" ||
+          cleanQuery.includes("stop playback") ||
+          cleanQuery.includes("stop audio")
+        ) {
+          actionsRef.current.stopAudio();
+          return true;
+        }
+      }
+
+      // 3. Close Player / Exit Course
+      if (stateRef.current.selectedCourse) {
+        if (
+          cleanQuery === "close" ||
+          cleanQuery === "exit" ||
+          cleanQuery.includes("close player") ||
+          cleanQuery.includes("exit course") ||
+          cleanQuery.includes("close course") ||
+          cleanQuery.includes("exit player")
+        ) {
+          actionsRef.current.closePlayer();
+          return true;
+        }
+      }
+
+      // 4. Lesson Navigation (when player is open and NOT showing quiz)
+      if (stateRef.current.selectedCourse && !stateRef.current.showQuiz) {
+        if (
+          cleanQuery.includes("next lesson") ||
+          cleanQuery.includes("next episode") ||
+          cleanQuery === "next" ||
+          cleanQuery.includes("go to next")
+        ) {
+          const lessons = stateRef.current.selectedCourse.lessons || [];
+          const nextIdx = stateRef.current.currentLessonIndex + 1;
+          if (nextIdx < lessons.length) {
+            actionsRef.current.selectLesson(nextIdx);
+          } else {
+            if (typeof window !== "undefined" && window.speechSynthesis) {
+              window.speechSynthesis.cancel();
+              const utterance = new SpeechSynthesisUtterance("This is the final lesson of the course.");
+              window.speechSynthesis.speak(utterance);
+            }
+          }
+          return true;
+        }
+        if (
+          cleanQuery.includes("previous lesson") ||
+          cleanQuery.includes("previous episode") ||
+          cleanQuery === "previous" ||
+          cleanQuery.includes("go back") ||
+          cleanQuery.includes("go to previous")
+        ) {
+          const prevIdx = stateRef.current.currentLessonIndex - 1;
+          if (prevIdx >= 0) {
+            actionsRef.current.selectLesson(prevIdx);
+          } else {
+            if (typeof window !== "undefined" && window.speechSynthesis) {
+              window.speechSynthesis.cancel();
+              const utterance = new SpeechSynthesisUtterance("This is the first lesson of the course.");
+              window.speechSynthesis.speak(utterance);
+            }
+          }
+          return true;
+        }
+      }
+
+      // 5. Quiz Interactions
+      if (stateRef.current.selectedCourse) {
+        // Start Quiz
+        if (!stateRef.current.showQuiz) {
+          if (
+            cleanQuery.includes("start quiz") ||
+            cleanQuery.includes("take quiz") ||
+            cleanQuery.includes("open quiz")
+          ) {
+            actionsRef.current.startQuiz();
+            return true;
+          }
+        } else {
+          // Active Quiz / Option Selection
+          if (!stateRef.current.quizFinished) {
+            const optionMatch = cleanQuery.match(/(?:option|choice|number)\s+(one|two|three|four|1|2|3|4)/i) || 
+                                cleanQuery.match(/^(one|two|three|four|1|2|3|4)$/i);
+            if (optionMatch) {
+              const optVal = optionMatch[1].toLowerCase();
+              let optIdx = -1;
+              if (optVal === "one" || optVal === "1") optIdx = 0;
+              else if (optVal === "two" || optVal === "2") optIdx = 1;
+              else if (optVal === "three" || optVal === "3") optIdx = 2;
+              else if (optVal === "four" || optVal === "4") optIdx = 3;
+              
+              if (optIdx >= 0 && optIdx < 4) {
+                actionsRef.current.handleSelectOption(optIdx);
+                return true;
+              }
+            }
+
+            if (
+              cleanQuery === "submit" ||
+              cleanQuery.includes("submit answer") ||
+              cleanQuery.includes("submit quiz")
+            ) {
+              actionsRef.current.handleSubmitAnswer();
+              return true;
+            }
+
+            if (
+              cleanQuery.includes("next question") ||
+              cleanQuery.includes("go to next question") ||
+              cleanQuery === "continue" ||
+              (stateRef.current.quizSubmitted && cleanQuery === "next")
+            ) {
+              actionsRef.current.handleNextQuestion();
+              return true;
+            }
+          } else {
+            // Quiz completed view
+            if (
+              cleanQuery.includes("retake") ||
+              cleanQuery.includes("restart") ||
+              cleanQuery.includes("try again")
+            ) {
+              actionsRef.current.startQuiz();
+              return true;
+            }
+            if (
+              cleanQuery.includes("back to player") ||
+              cleanQuery.includes("close quiz") ||
+              cleanQuery.includes("return")
+            ) {
+              actionsRef.current.setShowQuiz(false);
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <main className="relative min-h-screen pt-28 pb-20 px-4 md:px-8 flex flex-col items-center">

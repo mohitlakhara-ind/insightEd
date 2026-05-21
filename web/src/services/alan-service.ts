@@ -18,6 +18,7 @@ export class AlanService {
   private learnedCommands: Record<string, string> = {};
   private pendingQuery = "";
   private pendingQueryTime = 0;
+  private commandListeners: Set<(query: string, cleanQuery: string) => boolean> = new Set();
 
   private constructor() {
     if (typeof window !== "undefined") {
@@ -61,6 +62,13 @@ export class AlanService {
 
   public setNavigationCallback(callback: NavigationCallback) {
     this.onNavigateCallback = callback;
+  }
+
+  public registerCommandListener(listener: (query: string, cleanQuery: string) => boolean) {
+    this.commandListeners.add(listener);
+    return () => {
+      this.commandListeners.delete(listener);
+    };
   }
 
   private initSpeechRecognition() {
@@ -209,13 +217,25 @@ export class AlanService {
 
     useVoiceStore.getState().addCommand(query);
 
+    // Check if any registered command listeners handle this query
+    for (const listener of this.commandListeners) {
+      try {
+        if (listener(query, cleanQuery)) {
+          console.log("[VoiceAssistantService] Query handled by custom command listener");
+          return;
+        }
+      } catch (e) {
+        console.error("[VoiceAssistantService] Error in custom command listener:", e);
+      }
+    }
+
     let responseText = "";
     let targetRoute = "";
     let pageName = "";
 
     const courseKeywords = ["course", "learn", "lesson", "class", "study", "vocational", "catalog", "track"];
     const gameKeywords = ["game", "mind", "play", "puzzle", "match", "cognitive", "brain", "toy"];
-    const communityKeywords = ["community", "peer", "room", "chat", "connect", "group", "expert", "forum", "social"];
+    const communityKeywords = ["community", "ai community", "mitra", "sarah", "companion", "coach", "chat", "connect", "social"];
     const pronunciationKeywords = ["pronunciation", "speech", "coach", "practice", "speak", "talk", "voice", "pronounce", "speaking", "talking"];
     const homeKeywords = ["home", "welcome", "main", "start", "dashboard", "index"];
 
@@ -281,7 +301,7 @@ export class AlanService {
       targetRoute = "/games";
       pageName = "games page";
     } else if (matchesAny(cleanQuery, communityKeywords)) {
-      responseText = "Connecting you to the community peer rooms.";
+      responseText = "Connecting you to the AI Community workspace.";
       targetRoute = "/community";
       pageName = "community page";
     } else if (matchesAny(cleanQuery, pronunciationKeywords)) {

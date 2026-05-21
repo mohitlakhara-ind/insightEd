@@ -58,7 +58,7 @@ export function VoiceAssistantOverlay() {
       
       const courseKeywords = ["course", "learn", "lesson", "class", "study", "vocational", "catalog", "track"];
       const gameKeywords = ["game", "mind", "play", "puzzle", "match", "cognitive", "brain", "toy"];
-      const communityKeywords = ["community", "peer", "room", "chat", "connect", "group", "expert", "forum", "social"];
+      const communityKeywords = ["community", "ai community", "mitra", "sarah", "companion", "coach", "chat", "connect", "social"];
       const pronunciationKeywords = ["pronunciation", "speech", "coach", "practice", "speak", "talk", "voice", "pronounce", "speaking", "talking"];
       const homeKeywords = ["home", "welcome", "main", "start", "dashboard", "index"];
 
@@ -452,7 +452,7 @@ export function VoiceAssistantOverlay() {
                     { text: "Learn Vocations", cmd: "open courses" },
                     { text: "Play Mind Games", cmd: "open games" },
                     { text: "AI Speech Coach", cmd: "open pronunciation coach" },
-                    { text: "Join Peer Rooms", cmd: "open community" },
+                    { text: "Open AI Community", cmd: "open community" },
                   ].map((shortcut) => (
                     <button
                       key={shortcut.cmd}

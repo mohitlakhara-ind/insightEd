@@ -109,7 +109,7 @@ export function HomeHero() {
               href="/sign-in"
               className="inline-flex min-h-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-elevated)]/55 px-8 text-base font-semibold text-[var(--text-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-md transition-[border-color,box-shadow] hover:border-[color-mix(in_oklab,var(--accent)_55%,var(--border))] hover:shadow-[0_12px_40px_-28px_var(--accent-glow)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
             >
-              Sign in · Firebase soon
+              Sign in
             </Link>
           </motion.div>
         </motion.div>
@@ -196,7 +196,7 @@ const pillItems = [
   "Audio-first curricula",
   "Pronunciation scoring",
   "Calm notifications",
-  "Peer learning spaces",
+  "AI companions",
   "Offline-aware pacing",
 ];
 
@@ -204,5 +204,5 @@ const checklist = [
   "Skip link, landmarks, and oversized tap targets across marketing + app shells.",
   "Honors prefers-reduced-motion: decorative loops shrink to static gradients.",
   "Lexend typography tuned for extended listening + reading sessions.",
-  "Composable sections ready for Firebase auth and live mentor sessions.",
+  "Composable sections integrated with Firebase auth and AI coaches.",
 ];

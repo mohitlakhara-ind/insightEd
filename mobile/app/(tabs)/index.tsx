@@ -7,19 +7,27 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { fonts } from '@/constants/typography';
 import { useAuth } from '@/context/auth-context';
+import { useAccessibilityAnnouncement } from '@/context/accessibility-context';
 
 export default function TodayScreen() {
   const scheme = useColorScheme() ?? 'light';
   const c = Colors[scheme];
   const router = useRouter();
-  const { profile, signOutUser } = useAuth();
+  const { profile } = useAuth();
+
+  const firstName = profile?.displayName?.split(' ')[0] ?? 'Learner';
+
+  // Announce the screen when focused
+  useAccessibilityAnnouncement(
+    `Home screen, Learning Hub. Hello ${firstName}. You can explore pronunciation drills, courses, games, or the community.`
+  );
 
   return (
     <InsightScreen>
       <View style={styles.headerRow}>
         <View>
           <Text style={[styles.greeting, { color: c.textMuted, fontFamily: fonts.medium }]}>
-            Hello, {profile?.displayName?.split(' ')[0] ?? 'Learner'}
+            Hello, {firstName}
           </Text>
           <Text
             accessibilityRole="header"
@@ -29,14 +37,16 @@ export default function TodayScreen() {
           </Text>
         </View>
         <Pressable
-          onPress={signOutUser}
+          onPress={() => router.push('/profile')}
           accessibilityRole="button"
-          accessibilityLabel="Sign out"
+          accessibilityLabel="Open profile and settings"
+          accessibilityHint="Double tap to open profile, voice guidance toggle, or sign out"
           style={[styles.logoutBtn, { borderColor: c.border }]}
         >
-          <FontAwesome name="sign-out" size={18} color={c.textSecondary} />
+          <FontAwesome name="user-circle" size={20} color={c.textSecondary} />
         </Pressable>
       </View>
+
 
       <Text style={[styles.lede, { color: c.textSecondary, fontFamily: fonts.regular }]}>
         Vocational audio courses, pronunciation drills, and mind games — built for accessibility first.
@@ -59,14 +69,14 @@ export default function TodayScreen() {
         />
         <FeatureTile
           title="Mind games"
-          subtitle="Story adventures and memory match"
+          subtitle="Story adventures"
           icon="gamepad"
           colors={c}
           onPress={() => router.push('/games/story')}
         />
         <FeatureTile
           title="Community"
-          subtitle="Mentors and peer support"
+          subtitle="AI learning companion Mitra"
           icon="users"
           colors={c}
           onPress={() => router.push('/(tabs)/community')}

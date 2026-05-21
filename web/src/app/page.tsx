@@ -29,12 +29,12 @@ const highlights = [
     gridClass: "md:col-span-1",
   },
   {
-    title: "Expert Rooms & Peer Spaces",
+    title: "AI Coaches & Companions",
     description:
-      "Join active discussions and scheduling spaces with real human coaches. Accessibility-first live announcements keep you up-to-date in real-time.",
+      "Practice mock interviews with AI Recruiter Sarah, or find motivation and stress-relief checks with your learning companion Mitra.",
     href: "/community",
-    cta: "Connect with communities",
-    icon: "🤝",
+    cta: "Open AI Community",
+    icon: "🤖",
     gridClass: "md:col-span-1",
   },
   {
